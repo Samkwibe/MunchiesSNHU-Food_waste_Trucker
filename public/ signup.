@@ -1,0 +1,85 @@
+import { auth, db } from './firebase.js';
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import {
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+// Register button
+document.getElementById('signupBtn').addEventListener('click', async () => {
+  const name = document.getElementById('nameField').value;
+  const email = document.getElementById('emailField').value;
+  const password = document.getElementById('passwordField').value;
+  const confirm = document.getElementById('confirmField').value;
+
+  if (!name || !email || !password || password !== confirm) {
+    alert("Fill all fields and make sure passwords match.");
+    return;
+  }
+
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
+
+    await setDoc(doc(db, "users", user.uid), {
+      name,
+      email,
+      role: "student",
+      createdAt: new Date().toISOString()
+    });
+
+    alert("Signup successful! Redirecting...");
+    window.location.href = "login.html";
+  } catch (err) {
+    alert("Signup error: " + err.message);
+  }
+});
+
+// Google
+document.getElementById('googleBtn').addEventListener('click', async () => {
+  const provider = new GoogleAuthProvider();
+  await socialSignup(provider, "google");
+});
+
+// Facebook
+document.getElementById('facebookBtn').addEventListener('click', async () => {
+  const provider = new FacebookAuthProvider();
+  await socialSignup(provider, "facebook");
+});
+
+// Apple
+document.getElementById('appleBtn').addEventListener('click', async () => {
+  const provider = new OAuthProvider('apple.com');
+  await socialSignup(provider, "apple");
+});
+
+// Spotify
+document.getElementById('spotifyBtn').addEventListener('click', async () => {
+  alert("Spotify signup requires custom OAuth. Not supported by Firebase directly.");
+});
+
+async function socialSignup(provider, type) {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    await setDoc(doc(db, "users", user.uid), {
+      name: user.displayName || "",
+      email: user.email,
+      role: "student",
+      provider: type,
+      createdAt: new Date().toISOString()
+    });
+
+    alert(`${type} signup successful!`);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    alert(`${type} signup failed: ` + err.message);
+  }
+}
