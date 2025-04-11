@@ -1,147 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - SNHU Food Waster</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - SNHU Food Waste</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background: url('SETA.jpg') no-repeat center center fixed;
-      background-size: cover;
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      position: relative;
-      overflow: hidden;
+      background: url('SETA.jpg') no-repeat center center fixed;
+      background-size: cover;
       color: #fff;
     }
-
     .signup-container {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(12px);
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      width: 440px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
       text-align: center;
-      width: 400px;
-      z-index: 1;
     }
-
-    .signup-container h2 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #f3d014; /* SNHU gold */
+    h2 {
+      font-size: 26px;
+      color: #f3d014;
+      margin-bottom: 14px;
     }
-
-    .signup-container p {
-      font-size: 14px;
-      color: #eee;
-      margin-bottom: 20px;
-    }
-
-    .signup-container a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    .signup-container a:hover {
-      text-decoration: underline;
-    }
-
     .input-field {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #aaa;
+      margin: 10px 0;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 16px;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.25);
       color: #fff;
-      transition: border 0.2s ease;
+      font-size: 15px;
     }
     .input-field:focus {
-      outline: none;
       border-color: #f3d014;
-      box-shadow: 0 0 5px rgba(243,208,20,0.4);
+      outline: none;
     }
-
+    .role-selection {
+      text-align: left;
+      margin: 10px 0;
+      color: #eee;
+      font-size: 14px;
+    }
     .signup-btn {
       width: 100%;
       padding: 12px;
       background: linear-gradient(to right, #082241, #f3d014);
-      color: #ffffff;
       border: none;
       border-radius: 6px;
+      color: #fff;
       font-size: 16px;
+      margin-top: 14px;
       cursor: pointer;
-      margin-top: 10px;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s;
     }
     .signup-btn:hover {
       background: linear-gradient(to right, #06192d, #e6c800);
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
-
-    /* Social Logins */
-    .social-login {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
+    .status {
+      font-size: 14px;
+      margin-top: 10px;
+      color: #00ffcc;
     }
-    .social-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background-color: #e5e5e5;
-      cursor: pointer;
-      transition: transform 0.2s ease;
+    a {
+      color: #00aaff;
+      text-decoration: none;
     }
-    .social-btn:hover {
-      transform: scale(1.05);
+    a:hover {
+      text-decoration: underline;
     }
-    .social-btn img {
-      width: 24px;
-      height: 24px;
-    }
-
   </style>
 </head>
 <body>
-
   <div class="signup-container">
-    <h2>Create Account</h2>
-    <p>Already have an account? <a href="login.html">Log in</a></p>
+    <h2>🚀 Create Your Account</h2>
+    <input id="nameInput" type="text" class="input-field" placeholder="Full Name" />
+    <input id="emailInput" type="email" class="input-field" placeholder="Email" />
+    <input id="passwordInput" type="password" class="input-field" placeholder="Password" />
+    <input id="confirmPasswordInput" type="password" class="input-field" placeholder="Confirm Password" />
 
-    <input id="nameField" type="text" class="input-field" placeholder="Full Name">
-    <input id="emailField" type="email" class="input-field" placeholder="Email address">
-    <input id="passwordField" type="password" class="input-field" placeholder="Password">
-    <input id="confirmField" type="password" class="input-field" placeholder="Confirm Password">
-
-    <button class="signup-btn" id="signupBtn">Sign Up</button>
-
-    <!-- Social Sign-ups -->
-    <div class="social-login">
-      <!-- Apple -->
-      <div class="social-btn" id="appleBtn"><img src="apple-icon.png" alt="Apple"></div>
-      <!-- Facebook -->
-      <div class="social-btn" id="facebookBtn"><img src="facebook-icon.png" alt="Facebook"></div>
-      <!-- Spotify -->
-      <div class="social-btn" id="spotifyBtn"><img src="spotify-icon.png" alt="Spotify"></div>
-      <!-- Google -->
-      <div class="social-btn" id="googleBtn"><img src="google-icon.png" alt="Google"></div>
+    <div class="role-selection">
+      <label><input type="radio" name="role" value="student" checked> 🎓 Student</label>
+      <label style="margin-left: 15px;"><input type="radio" name="role" value="staff"> 🧑‍💼 Staff</label>
     </div>
+
+    <button id="signupBtn" class="signup-btn">✅ Sign Up</button>
+    <p class="status" id="status"></p>
+    <p>Already registered? <a href="login.html">Log in here</a></p>
   </div>
 
-  <script type="module" src="./firebase.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCM598ds463x-UZUd4nsnMnZ9er4n6fgy8",
+      authDomain: "munchies-snhu-food-waste-46555.firebaseapp.com",
+      projectId: "munchies-snhu-food-waste-46555",
+      storageBucket: "munchies-snhu-food-waste-46555.firebasestorage.app",
+      messagingSenderId: "287560600222",
+      appId: "1:287560600222:web:97441f10c596fe18ed098f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const signupBtn = document.getElementById('signupBtn');
+    const statusText = document.getElementById('status');
+
+    signupBtn.addEventListener('click', async () => {
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const confirm = document.getElementById('confirmPasswordInput').value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+
+      statusText.textContent = "";
+
+      if (!name || !email || !password || !confirm) {
+        statusText.textContent = "⚠️ Please fill out all fields.";
+        return;
+      }
+
+      if (password !== confirm) {
+        statusText.textContent = "⚠️ Passwords do not match.";
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          name,
+          email,
+          role,
+          createdAt: serverTimestamp(),
+        });
+
+        statusText.textContent = "✅ Signup successful! Redirecting...";
+        setTimeout(() => {
+          window.location.href = role === 'staff' ? 'settings-staff.html' : 'settings-student.html';
+        }, 1500);
+      } catch (error) {
+        statusText.textContent = "❌ " + error.message;
+      }
+    });
   </script>
 </body>
 </html>

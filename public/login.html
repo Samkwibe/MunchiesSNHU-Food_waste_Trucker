@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI-Secured Login - SNHU Food Waster</title>
+  <title>Login - SNHU Food Waster</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    /* ✅ Your original design stays 100% the same! */
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
@@ -17,37 +16,20 @@
       background: url('SETA.jpg') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
-      overflow: hidden;
-      position: relative;
     }
     .login-container {
-      position: relative;
-      z-index: 5;
-      width: 420px;
-      padding: 30px;
-      border-radius: 16px;
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      padding: 30px;
+      border-radius: 16px;
+      width: 420px;
       text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
-    .login-container h2 {
+    h2 {
       font-size: 28px;
       margin-bottom: 10px;
       color: #f3d014;
-    }
-    .login-container p {
-      font-size: 14px;
-      color: #eee;
-      margin-bottom: 20px;
-    }
-    .login-container a {
-      color: #ff6600;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .login-container a:hover {
-      text-decoration: underline;
     }
     .input-field {
       width: 100%;
@@ -58,128 +40,99 @@
       font-size: 16px;
       background: rgba(255,255,255,0.3);
       color: #fff;
-      transition: border 0.2s ease;
-    }
-    .input-field:focus {
-      outline: none;
-      border-color: #f3d014;
-      box-shadow: 0 0 5px rgba(243,208,20,0.4);
-    }
-    .strength-label {
-      text-align: left;
-      font-size: 14px;
-      margin: 5px 0 2px;
-      color: #ccc;
-      min-height: 18px;
-    }
-    .strength-meter {
-      height: 8px;
-      background: #999;
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.3s;
-    }
-    .extras-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      margin: 8px 0;
-      color: #ccc;
-    }
-    .extras-row a {
-      color: #00aaff;
-      text-decoration: none;
-    }
-    .extras-row a:hover {
-      text-decoration: underline;
     }
     .login-btn {
       width: 100%;
       padding: 12px;
       background: linear-gradient(to right, #082241, #f3d014);
-      color: #ffffff;
       border: none;
       border-radius: 6px;
+      color: #fff;
       font-size: 16px;
       cursor: pointer;
       margin-top: 10px;
-      transition: transform 0.2s ease;
     }
     .login-btn:hover {
       background: linear-gradient(to right, #06192d, #e6c800);
-      transform: scale(1.02);
     }
-    .social-login {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    .social-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background-color: #e5e5e5;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .social-btn:hover {
-      transform: scale(1.05);
-    }
-    .social-btn img {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-    }
-    .sso-btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #ddd;
-      color: #333;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
+    .status-text {
       margin-top: 15px;
-      transition: background 0.2s ease;
+      color: #eee;
+      font-size: 14px;
     }
-    .sso-btn:hover {
-      background-color: #c2c2c2;
+    .forgot-link {
+      display: block;
+      margin-top: 10px;
+      color: #00ffff;
+      font-size: 14px;
+      text-decoration: underline;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
   <div class="login-container">
-    <h2>AI-Secured Login</h2>
-    <p>New user? <a href="signup.html">Create an Account</a></p>
+    <h2>🔐 AI-Secured Login</h2>
+    <p>New user? <a href="signup.html" style="color:#00ffff;">Create an Account</a></p>
 
-    <input id="emailInput" type="email" class="input-field" placeholder="Email address" />
-    <input id="passwordInput" type="password" class="input-field" placeholder="Password (8+ characters)" />
-    <div class="strength-label" id="strengthLabel"></div>
-    <div class="strength-meter" id="strengthBar"></div>
-
-    <div class="extras-row">
-      <label><input type="checkbox" id="rememberMe"> Remember Me</label>
-      <a href="#">Forgot password?</a>
-    </div>
-
+    <input id="emailInput" type="email" class="input-field" placeholder="📧 Email address" />
+    <input id="passwordInput" type="password" class="input-field" placeholder="🔑 Password" />
     <button class="login-btn" id="loginBtn">Log in</button>
 
-    <div class="social-login">
-      <div class="social-btn" id="appleBtn"><img src="apple-icon.png" alt="Apple" /></div>
-      <div class="social-btn" id="facebookBtn"><img src="facebook-icon.png" alt="Facebook" /></div>
-      <div class="social-btn" id="spotifyBtn"><img src="spotify-icon.png" alt="Spotify" /></div>
-      <div class="social-btn" id="googleBtn"><img src="google-icon.png" alt="Google" /></div>
-    </div>
+    <span class="forgot-link" onclick="showResetPrompt()">Forgot Password?</span>
 
-    <button class="sso-btn">Log in with SSO</button>
+    <p class="status-text" id="statusMsg"></p>
   </div>
 
-  <!-- ✅ This is the only JavaScript you need to include -->
-  <script type="module" src="login.js"></script>
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    loginBtn.addEventListener('click', async () => {
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+
+      statusMsg.textContent = '🔄 Checking credentials...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Server error');
+
+        statusMsg.textContent = '✅ Login successful! Redirecting...';
+        setTimeout(() => {
+          window.location.href = data.role === 'staff' ? 'settings-staff.html' : 'settings-student.html';
+        }, 1000);
+      } catch (err) {
+        statusMsg.textContent = '❌ Error: ' + err.message;
+      }
+    });
+
+    function showResetPrompt() {
+      const email = prompt('Enter your email to reset your password:');
+      if (!email) return;
+      const newPassword = prompt('Enter your new password:');
+      if (!newPassword) return;
+
+      fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, newPassword })
+      })
+        .then(res => res.json())
+        .then(data => {
+          statusMsg.textContent = data.message || '✅ Password reset successful!';
+        })
+        .catch(err => {
+          statusMsg.textContent = '❌ Error: ' + err.message;
+        });
+    }
+  </script>
 </body>
 </html>
