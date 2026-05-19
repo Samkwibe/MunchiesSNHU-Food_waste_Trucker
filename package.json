@@ -1,0 +1,12 @@
+{
+  "name": "munchies-snhu",
+  "version": "1.0.0",
+  "description": "Frontend deployment script",
+  "homepage": "https://Samkwibe.github.io/MunchiesSNHU-Food_waste_Trucker",
+  "scripts": {
+    "deploy": "gh-pages -d public"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}

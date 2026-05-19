@@ -130,7 +130,7 @@
         <li><a href="student-dashboard.html">Dashboard</a></li>
         <!-- No staff-only "Reports" link here -->
         <li><a href="settings-student.html">Settings</a></li>
-        <li><a href="index.html">Logout</a></li>
+        <li><a href="login.html" data-logout>Logout</a></li>
       </ul>
     </nav>
   </header>
@@ -183,5 +183,10 @@
   <footer>
     🔄 Data auto-refreshes every 2 hours | SNHU Food Waster Tracker (Student)
   </footer>
+  <script src="js/auth.js"></script>
+  <script>
+    window.MunchiesAuth.requireAuth(['student']);
+    window.MunchiesAuth.setupLogoutLinks();
+  </script>
 </body>
 </html>

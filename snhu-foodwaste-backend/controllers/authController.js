@@ -29,6 +29,11 @@ const generateToken = (id, role) => {
   );
 };
 
+const sendError = (res, statusCode, message) => res.status(statusCode).json({
+  success: false,
+  message
+});
+
 // ==========================================
 // Controller Actions
 // ==========================================
@@ -43,12 +48,17 @@ const generateToken = (id, role) => {
 const registerUser = async (req, res) => {
   // Extract user details from the request body
   const { name, email, password, role } = req.body;
+  const requestedRole = role || 'student';
   
   try {
+    if (!['student', 'staff'].includes(requestedRole)) {
+      return sendError(res, 400, 'Invalid registration role');
+    }
+
     // 1. Check if a user with the given email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
+      return sendError(res, 400, 'Email already registered');
     }
 
     // 2. Hash the user's password for secure storage
@@ -60,7 +70,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || 'student' // Default to 'student' if no role is provided
+      role: requestedRole // Default to 'student' if no role is provided
     });
 
     // 4. Generate an authentication token for the newly registered user
@@ -76,7 +86,7 @@ const registerUser = async (req, res) => {
     });
   } catch (err) {
     console.error('Error during user registration:', err);
-    res.status(500).json({ message: 'Server error' });
+    sendError(res, 500, 'Server error');
   }
 };
 
@@ -97,13 +107,13 @@ const loginUser = async (req, res) => {
     
     // If no user is found, return an unauthorized error
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return sendError(res, 401, 'Invalid credentials');
     }
 
     // 2. Compare the provided password with the hashed password in the database
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return sendError(res, 401, 'Invalid credentials');
     }
 
     // 3. Generate an authentication token for the verified user
@@ -119,7 +129,7 @@ const loginUser = async (req, res) => {
     });
   } catch (err) {
     console.error('Error during user login:', err);
-    res.status(500).json({ message: 'Server error' });
+    sendError(res, 500, 'Server error');
   }
 };
 
@@ -137,7 +147,7 @@ const getCurrentUser = async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error('Error fetching current user:', err);
-    res.status(500).json({ message: 'Server error' });
+    sendError(res, 500, 'Server error');
   }
 };
 
@@ -160,7 +170,7 @@ const updateUserProfile = async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error('Error updating user profile:', err);
-    res.status(500).json({ message: 'Server error' });
+    sendError(res, 500, 'Server error');
   }
 };
 

@@ -1,1 +1,10 @@
 .qodo
+node_modules/
+.env
+*.env
+!*.env.example
+coverage/
+
+# Keep the before snapshot, but never archive secrets or dependencies inside it
+before-enhancement/**/node_modules/
+before-enhancement/**/.env

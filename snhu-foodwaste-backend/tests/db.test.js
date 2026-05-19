@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 
+jest.mock('mongoose', () => ({
+  connect: jest.fn()
+}));
+
 describe('connectDB', () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -18,12 +22,15 @@ describe('connectDB', () => {
   });
 
   it('should exit process when MongoDB connection fails', async () => {
-    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
+      throw new Error('process.exit');
+    });
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     jest.spyOn(mongoose, 'connect').mockRejectedValueOnce(new Error('Invalid URI'));
 
     delete process.env.MONGODB_URI;
-    await connectDB();
+    delete process.env.MONGO_URI;
+    await expect(connectDB()).rejects.toThrow('process.exit');
 
     expect(consoleErrorSpy).toHaveBeenCalled();
     expect(mockExit).toHaveBeenCalledWith(1);

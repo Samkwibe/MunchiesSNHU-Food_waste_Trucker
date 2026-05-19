@@ -6,6 +6,16 @@ const express = require('express');
 const router = express.Router();
 // Import the FoodWasteEntry model to interact with our database collection
 const FoodWasteEntry = require('../models/FoodWasteEntry');
+// Import middleware that checks the JWT and verifies staff/admin roles.
+const { protect, authorize } = require('../middleware/authMiddleware');
+// Import the helper that calculates and sorts pickup priority scores.
+const { rankWasteEntries } = require('../utils/wastePriority');
+const { sanitizeWasteBody, formatMongooseError } = require('../utils/sanitizeWasteBody');
+
+const sendError = (res, statusCode, message) => res.status(statusCode).json({
+  success: false,
+  message
+});
 
 // 1. GET all published entries (students can see these)
 // Define a GET route at the root path '/' with an asynchronous callback function taking request (req) and response (res)
@@ -21,63 +31,171 @@ router.get('/', async (req, res) => {
   // Catch any errors that happen in the try block
   } catch (err) {
     // Send a 500 (Internal Server Error) status code and the error message in JSON format
-    res.status(500).json({ message: err.message });
+    sendError(res, 500, err.message);
   }
 });
 
-// 2. POST new waste entry (staff usage)
+// 2. GET all entries for staff/admin management
+router.get('/all', protect, authorize('staff', 'admin'), async (req, res) => {
+  // The route is protected because unpublished operational records should only be visible to staff/admin.
+  try {
+    // Fetch every entry and show the newest entries first for management screens.
+    const entries = await FoodWasteEntry.find().sort({ createdAt: -1 });
+    // Send the entries back to the frontend as JSON.
+    res.json(entries);
+  } catch (err) {
+    // If the database query fails, return a server error with the message.
+    sendError(res, 500, err.message);
+  }
+});
+
+// 3. GET ranked pickup priorities for staff/admin users
+router.get('/priority', protect, authorize('staff', 'admin'), async (req, res) => {
+  try {
+    // Pull the latest 50 entries so the priority screen focuses on recent operational data.
+    const entries = await FoodWasteEntry.find().sort({ createdAt: -1 }).limit(50);
+    // rankWasteEntries adds priorityScore, priorityLevel, and reasons to each entry.
+    res.json(rankWasteEntries(entries));
+  } catch (err) {
+    // Return a 500 response if priority data cannot be loaded.
+    sendError(res, 500, err.message);
+  }
+});
+
+// 4. GET reporting summary using MongoDB aggregation
+router.get('/reports/summary', protect, authorize('staff', 'admin'), async (req, res) => {
+  try {
+    // This aggregation produces one overall summary document for the dashboard KPI cards.
+    const [totals] = await FoodWasteEntry.aggregate([
+      {
+        // $group combines all records into one group because _id is null.
+        $group: {
+          _id: null,
+          // Add up all recorded waste weight.
+          totalWaste: { $sum: '$weight' },
+          // Add up all recorded compost weight.
+          totalCompost: { $sum: '$compostWeight' },
+          // Average the latest sensor-style readings for high-level reporting.
+          averageBinFullness: { $avg: '$binFullness' },
+          averageHumidity: { $avg: '$humidity' },
+          averagePH: { $avg: '$pH' },
+          // Count the number of entries included in the report.
+          entryCount: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // This aggregation groups records by location so staff can see which areas generate the most waste.
+    const byLocation = await FoodWasteEntry.aggregate([
+      {
+        $group: {
+          // The location becomes the grouping key.
+          _id: '$location',
+          // These fields summarize waste and compost amounts for each location.
+          totalWaste: { $sum: '$weight' },
+          totalCompost: { $sum: '$compostWeight' },
+          averageBinFullness: { $avg: '$binFullness' },
+          entryCount: { $sum: 1 }
+        }
+      },
+      // Sort highest waste locations first so the table is more useful.
+      { $sort: { totalWaste: -1 } }
+    ]);
+
+    // This aggregation groups records by date for charting daily trends.
+    const dailyTrend = await FoodWasteEntry.aggregate([
+      {
+        $group: {
+          _id: {
+            // Convert the Date value into YYYY-MM-DD so entries from the same day group together.
+            $dateToString: { format: '%Y-%m-%d', date: '$date' }
+          },
+          // Sum and average the important reporting fields for each day.
+          totalWaste: { $sum: '$weight' },
+          totalCompost: { $sum: '$compostWeight' },
+          averageBinFullness: { $avg: '$binFullness' },
+          entryCount: { $sum: 1 }
+        }
+      },
+      // Sort dates from oldest to newest for the chart.
+      { $sort: { _id: 1 } },
+      // Limit the result so the frontend chart stays readable.
+      { $limit: 14 }
+    ]);
+
+    // Use 0 when there are no records yet so the frontend does not receive undefined values.
+    const totalWaste = totals?.totalWaste || 0;
+    const totalCompost = totals?.totalCompost || 0;
+
+    // Send one combined report object to the dashboard and report pages.
+    res.json({
+      totalWaste,
+      totalCompost,
+      // Compost diversion rate shows what percent of waste was redirected to compost.
+      compostDiversionRate: totalWaste > 0
+        ? Math.min(100, Math.round((totalCompost / totalWaste) * 100))
+        : 0,
+      // Round averages so KPI cards show clean numbers.
+      averageBinFullness: Math.round(totals?.averageBinFullness || 0),
+      averageHumidity: Math.round(totals?.averageHumidity || 0),
+      averagePH: Number((totals?.averagePH || 0).toFixed(1)),
+      entryCount: totals?.entryCount || 0,
+      byLocation,
+      dailyTrend
+    });
+  } catch (err) {
+    // If any aggregation fails, return a server error.
+    sendError(res, 500, err.message);
+  }
+});
+
+// 5. POST new waste entry (staff/admin usage)
 // Define a POST route at the root path '/' to handle creating new entries
-router.post('/', async (req, res) => {
+router.post('/', protect, authorize('staff', 'admin'), async (req, res) => {
   // Start a try block for the database creation operation
   try {
-    // Staff calls this with body data
-    // Await the creation of a new FoodWasteEntry document in the database
+    const entryFields = sanitizeWasteBody(req.body);
     const newEntry = await FoodWasteEntry.create({
-      // Set the submittedBy field using data from the request body (req.body)
-      submittedBy: req.body.submittedBy, // staffId
-      // Set the foodType field from the request body
-      foodType: req.body.foodType,
-      // Set the weight field from the request body
-      weight: req.body.weight,
-      // Set the date field from the request body
-      date: req.body.date,
-      // Set the location field from the request body
-      location: req.body.location,
-      // Set the notes field from the request body
-      notes: req.body.notes,
-      // Set the temperature field from the request body
-      temperature: req.body.temperature,
-      // Set the humidity field from the request body
-      humidity: req.body.humidity,
-      // Set the pH field from the request body
-      pH: req.body.pH,
-      // Set the gas emissions field from the request body
-      gas: req.body.gas,
-      // Set the binFullness field from the request body
-      binFullness: req.body.binFullness,
-      // Set the compostWeight field from the request body
-      compostWeight: req.body.compostWeight,
-      // Set published to false by default so it doesn't show up immediately
-      published: false // default as false
+      submittedBy: req.user._id,
+      ...entryFields,
+      published: false
     });
-    // Send a 201 (Created) status code and the newly created entry as JSON
     res.status(201).json(newEntry);
-  // Catch any errors, such as missing required fields
   } catch (err) {
-    // Send a 400 (Bad Request) status code with the error message
-    res.status(400).json({ message: err.message });
+    sendError(res, err.statusCode || 400, formatMongooseError(err));
   }
 });
 
-// 3. PUT to publish/unpublish an entry
+// 6. PUT to update an existing waste entry
+router.put('/:id', protect, authorize('staff', 'admin'), async (req, res) => {
+  try {
+    // Find the entry by URL id and update only the fields staff can edit from the form.
+    const entryFields = sanitizeWasteBody(req.body);
+    const entry = await FoodWasteEntry.findByIdAndUpdate(
+      req.params.id,
+      entryFields,
+      { new: true, runValidators: true }
+    );
+
+    // If MongoDB did not find an entry with that id, return a 404 response.
+    if (!entry) return sendError(res, 404, 'Entry not found');
+
+    // Return the updated entry to the frontend.
+    return res.json(entry);
+  } catch (err) {
+    return sendError(res, err.statusCode || 400, formatMongooseError(err));
+  }
+});
+
+// 7. PUT to publish/unpublish an entry
 // Define a PUT route with a dynamic parameter ':id' for the entry's unique ID
-router.put('/:id/publish', async (req, res) => {
+router.put('/:id/publish', protect, authorize('staff', 'admin'), async (req, res) => {
   // Start a try block
   try {
     // Await finding the specific entry in the database using the ID from the URL (req.params.id)
     const entry = await FoodWasteEntry.findById(req.params.id);
     // If no entry is found with that ID, return a 404 (Not Found) error
-    if (!entry) return res.status(404).json({ message: 'Entry not found' });
+    if (!entry) return sendError(res, 404, 'Entry not found');
 
     // Update the 'published' property of the entry with the value from the request body (true or false)
     entry.published = req.body.published; // true or false
@@ -89,7 +207,23 @@ router.put('/:id/publish', async (req, res) => {
   // Catch any errors during the update process
   } catch (err) {
     // Send a 500 status code and the error message
-    res.status(500).json({ message: err.message });
+    sendError(res, 500, err.message);
+  }
+});
+
+// 8. DELETE an existing waste entry
+router.delete('/:id', protect, authorize('staff', 'admin'), async (req, res) => {
+  try {
+    // Find the entry by id and remove it from MongoDB.
+    const entry = await FoodWasteEntry.findByIdAndDelete(req.params.id);
+    // Return 404 when the id does not match an existing record.
+    if (!entry) return sendError(res, 404, 'Entry not found');
+
+    // Confirm deletion to the frontend.
+    return res.json({ message: 'Entry deleted' });
+  } catch (err) {
+    // Return 500 for unexpected database errors.
+    return sendError(res, 500, err.message);
   }
 });
 

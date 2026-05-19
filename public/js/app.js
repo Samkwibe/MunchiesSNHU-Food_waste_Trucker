@@ -1,30 +1,37 @@
+let weightChart;
+let humidityChart;
+
 /**
- * Fetches the latest sensor data from the backend API.
- * 
- * @returns {Promise<Array>} A promise that resolves to an array of sensor data objects.
+ * Fetches the latest published food waste data from the backend API.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of food waste entries.
  */
 async function fetchData() {
-    // Send a GET request to the local backend server for data
-    const response = await fetch('http://localhost:8000/data');
-    // Parse the JSON response
-    const json = await response.json();
-    // Return the actual data array from the parsed response
-    return json.data;
-  }
+  // Use the same Express API route as the rest of the app instead of a hard-coded localhost port.
+  const response = await fetch('/api/waste');
+  if (!response.ok) throw new Error('Unable to fetch food waste data');
+
+  // Parse the JSON response
+  return response.json();
+}
   
-  /**
-   * Main function to fetch data and render/update the charts on the dashboard.
-   */
-  async function renderCharts() {
+/**
+ * Main function to fetch data and render/update the charts on the dashboard.
+ */
+async function renderCharts() {
+  try {
     // Await the latest data from the backend
     const data = await fetchData();
+    if (!Array.isArray(data) || data.length === 0) {
+      return;
+    }
   
     // ==========================================
     // Data Processing & Extraction
     // ==========================================
     
     // Extract timestamps and format them to local time strings for the X-axis
-    const timestamps = data.map(d => new Date(d.timestamp).toLocaleTimeString());
+    const timestamps = data.map(d => new Date(d.date || d.createdAt).toLocaleTimeString());
     
     // Extract weight values for the line chart dataset
     const weights = data.map(d => d.weight);
@@ -33,7 +40,7 @@ async function fetchData() {
     const humidities = data.map(d => d.humidity);
     
     // Get the most recent fullness and pH readings from the latest data point (last element)
-    const fullness = data[data.length - 1].fullness;
+    const fullness = data[data.length - 1].binFullness;
     const ph = data[data.length - 1].pH;
   
     // ==========================================
@@ -41,52 +48,75 @@ async function fetchData() {
     // ==========================================
   
     // Initialize the Weight Line Chart
-    new Chart(document.getElementById('weightChart'), {
-      type: 'line',
-      data: {
-        labels: timestamps,
-        datasets: [{ 
-            label: 'Weight (lbs)', 
-            data: weights, 
-            borderWidth: 2, 
-            borderColor: '#4caf50' // Green border color
-        }]
+    const weightChartElement = document.getElementById('weightChart');
+    if (weightChartElement) {
+      if (weightChart) {
+        weightChart.data.labels = timestamps;
+        weightChart.data.datasets[0].data = weights;
+        weightChart.update();
+      } else {
+        weightChart = new Chart(weightChartElement, {
+          type: 'line',
+          data: {
+            labels: timestamps,
+            datasets: [{ 
+              label: 'Weight (lbs)', 
+              data: weights, 
+              borderWidth: 2, 
+              borderColor: '#4caf50' // Green border color
+            }]
+          }
+        });
       }
-    });
+    }
   
     // Initialize the Humidity Bar Chart
-    new Chart(document.getElementById('humidityChart'), {
-      type: 'bar',
-      data: {
-        labels: timestamps,
-        datasets: [{ 
-            label: 'Humidity (%)', 
-            data: humidities, 
-            backgroundColor: '#42a5f5' // Blue background color
-        }]
+    const humidityChartElement = document.getElementById('humidityChart');
+    if (humidityChartElement) {
+      if (humidityChart) {
+        humidityChart.data.labels = timestamps;
+        humidityChart.data.datasets[0].data = humidities;
+        humidityChart.update();
+      } else {
+        humidityChart = new Chart(humidityChartElement, {
+          type: 'bar',
+          data: {
+            labels: timestamps,
+            datasets: [{ 
+              label: 'Humidity (%)', 
+              data: humidities, 
+              backgroundColor: '#42a5f5' // Blue background color
+            }]
+          }
+        });
       }
-    });
+    }
   
     // ==========================================
     // UI Updates
     // ==========================================
   
     // Update the Fullness Gauge element with the latest value
-    document.getElementById('fullnessGauge').value = fullness;
+    const fullnessGauge = document.getElementById('fullnessGauge');
+    if (fullnessGauge) fullnessGauge.value = fullness;
     // Update the textual display for the Fullness Gauge
-    document.getElementById('fullnessValue').innerText = `${fullness}%`;
+    const fullnessValue = document.getElementById('fullnessValue');
+    if (fullnessValue) fullnessValue.innerText = `${fullness}%`;
   
     // Update the pH Level display with the latest reading
-    document.getElementById('phValue').innerText = ph;
+    const phValue = document.getElementById('phValue');
+    if (phValue) phValue.innerText = ph;
+  } catch (error) {
+    console.error('Unable to render charts:', error);
   }
+}
   
-  // ==========================================
-  // Initialization & Polling
-  // ==========================================
+// ==========================================
+// Initialization & Polling
+// ==========================================
   
-  // Perform an initial render of the charts immediately on load
-  renderCharts();
+// Perform an initial render of the charts immediately on load
+renderCharts();
   
-  // Set up a polling interval to refresh the dashboard data every 10 seconds (10000ms)
-  setInterval(renderCharts, 10000);
-  
+// Set up a polling interval to refresh the dashboard data every 10 seconds (10000ms)
+setInterval(renderCharts, 10000);

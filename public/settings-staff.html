@@ -166,10 +166,10 @@
     <div class="logo">SNHU Sustainability (Staff)</div>
     <nav>
       <ul>
-        <li><a href="office.html">Dashboard</a></li>
+        <li><a href="staff-dashboard.html">Dashboard</a></li>
         <li><a href="staff-report.html">Reports</a></li>
         <li><a href="settings-staff.html">Settings</a></li>
-        <li><a href="index.html">Logout</a></li>
+        <li><a href="login.html" data-logout>Logout</a></li>
       </ul>
     </nav>
   </header>
@@ -304,5 +304,10 @@
   <footer>
     🔄 Data auto-refreshes every 2 hours | SNHU Food Waster Tracker (Staff)
   </footer>
+  <script src="js/auth.js"></script>
+  <script>
+    window.MunchiesAuth.requireAuth(['staff', 'admin']);
+    window.MunchiesAuth.setupLogoutLinks();
+  </script>
 </body>
 </html>

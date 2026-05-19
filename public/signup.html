@@ -2,121 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up - SNHU Food Waste</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: url('assets/images/SETA.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-    }
-    .signup-container {
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(12px);
-      padding: 30px;
-      border-radius: 20px;
-      width: 440px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-      text-align: center;
-    }
-    h2 {
-      font-size: 26px;
-      color: #f3d014;
-      margin-bottom: 14px;
-    }
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.25);
-      color: #fff;
-      font-size: 15px;
-    }
-    .input-field:focus {
-      border-color: #f3d014;
-      outline: none;
-    }
-    .role-selection {
-      text-align: left;
-      margin: 10px 0;
-      color: #eee;
-      font-size: 14px;
-    }
-    .signup-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(to right, #082241, #f3d014);
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      font-size: 16px;
-      margin-top: 14px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .signup-btn:hover {
-      background: linear-gradient(to right, #06192d, #e6c800);
-      transform: scale(1.03);
-    }
-    .status {
-      font-size: 14px;
-      margin-top: 10px;
-      color: #00ffcc;
-    }
-    a {
-      color: #00aaff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account - MunchiesSNHU</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
 </head>
-<body>
-  <div class="signup-container">
-    <h2>🚀 Create Your Account</h2>
-    <input id="nameInput" type="text" class="input-field" placeholder="Full Name" />
-    <input id="emailInput" type="email" class="input-field" placeholder="Email" />
-    <input id="passwordInput" type="password" class="input-field" placeholder="Password" />
-    <input id="confirmPasswordInput" type="password" class="input-field" placeholder="Confirm Password" />
+<body class="auth-shell">
+  <section class="auth-marketing">
+    <div class="eyebrow">Join the Sustainability Workflow</div>
+    <h1>Create an account for campus sustainability tracking.</h1>
+    <p>Choose the role that matches how you will use the food waste tracker and continue to your dashboard.</p>
 
-    <div class="role-selection">
-      <label><input type="radio" name="role" value="student" checked> 🎓 Student</label>
-      <label style="margin-left: 15px;"><input type="radio" name="role" value="staff"> 🧑‍💼 Staff</label>
+    <div class="auth-stat-row">
+      <div class="auth-stat">
+        <strong>Track</strong>
+        <span>Waste activity</span>
+      </div>
+      <div class="auth-stat">
+        <strong>Reduce</strong>
+        <span>Campus waste</span>
+      </div>
+      <div class="auth-stat">
+        <strong>Report</strong>
+        <span>Progress clearly</span>
+      </div>
     </div>
 
-    <button id="signupBtn" class="signup-btn">✅ Sign Up</button>
-    <p class="status" id="status"></p>
-    <p>Already registered? <a href="login.html">Log in here</a></p>
-  </div>
+    <div class="auth-feature-list">
+      <div class="auth-feature">
+        <strong>Student Access</strong>
+        <p>Students can view sustainability information and learn how food waste is being reduced.</p>
+      </div>
+      <div class="auth-feature">
+        <strong>Staff Access</strong>
+        <p>Staff can enter waste data, review reports, and monitor campus food waste activity.</p>
+      </div>
+    </div>
+  </section>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  <main class="auth-card-wrap">
+    <section class="auth-card">
+      <div class="eyebrow">Account Setup</div>
+      <h2>Create your account</h2>
+      <p>Choose the role that matches how you will use the food waste tracker.</p>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCM598ds463x-UZUd4nsnMnZ9er4n6fgy8",
-      authDomain: "munchies-snhu-food-waste-46555.firebaseapp.com",
-      projectId: "munchies-snhu-food-waste-46555",
-      storageBucket: "munchies-snhu-food-waste-46555.firebasestorage.app",
-      messagingSenderId: "287560600222",
-      appId: "1:287560600222:web:97441f10c596fe18ed098f"
-    };
+      <div class="auth-field">
+        <label for="nameInput">Full name</label>
+        <input id="nameInput" type="text" autocomplete="name" placeholder="Your name" />
+      </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      <div class="auth-field">
+        <label for="emailInput">Email address</label>
+        <input id="emailInput" type="email" autocomplete="email" placeholder="name@snhu.edu" />
+      </div>
 
+      <div class="auth-field">
+        <label for="passwordInput">Password</label>
+        <div class="password-wrap">
+          <input id="passwordInput" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+          <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('passwordInput', this)">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label for="confirmPasswordInput">Confirm password</label>
+        <div class="password-wrap">
+          <input id="confirmPasswordInput" type="password" autocomplete="new-password" placeholder="Re-enter password" />
+          <button type="button" class="password-toggle" aria-label="Show password" onclick="togglePassword('confirmPasswordInput', this)">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="role-pill-row" aria-label="Role selection">
+        <label class="role-pill">
+          <input type="radio" name="role" value="student" checked />
+          Student
+        </label>
+        <label class="role-pill">
+          <input type="radio" name="role" value="staff" />
+          Staff
+        </label>
+      </div>
+
+      <button id="signupBtn" class="btn auth-submit">Create account</button>
+
+      <div class="divider">or sign up with</div>
+      <div class="sso-grid">
+        <button type="button" class="sso-button sso-google" onclick="showSsoMessage('Google')">
+          <i class="fa-brands fa-google"></i> Google
+        </button>
+        <button type="button" class="sso-button sso-microsoft" onclick="showSsoMessage('Microsoft')">
+          <i class="fa-brands fa-microsoft"></i> Microsoft
+        </button>
+        <button type="button" class="sso-button sso-apple" onclick="showSsoMessage('Apple')">
+          <i class="fa-brands fa-apple"></i> Apple
+        </button>
+      </div>
+
+      <p class="status-message" id="status" aria-live="polite"></p>
+      <p class="auth-switch">Already registered? <a href="login.html">Log in here</a></p>
+    </section>
+  </main>
+
+  <script>
     const signupBtn = document.getElementById('signupBtn');
     const statusText = document.getElementById('status');
 
@@ -127,37 +119,58 @@
       const confirm = document.getElementById('confirmPasswordInput').value;
       const role = document.querySelector('input[name="role"]:checked').value;
 
-      statusText.textContent = "";
+      statusText.textContent = '';
 
       if (!name || !email || !password || !confirm) {
-        statusText.textContent = "⚠️ Please fill out all fields.";
+        statusText.textContent = 'Please fill out all fields.';
         return;
       }
 
       if (password !== confirm) {
-        statusText.textContent = "⚠️ Passwords do not match.";
+        statusText.textContent = 'Passwords do not match.';
         return;
       }
 
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
-          name,
-          email,
-          role,
-          createdAt: serverTimestamp(),
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role })
         });
 
-        statusText.textContent = "✅ Signup successful! Redirecting...";
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Signup failed');
+
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: data._id,
+          name: data.name,
+          email: data.email,
+          role: data.role
+        }));
+
+        statusText.textContent = 'Signup successful. Redirecting...';
         setTimeout(() => {
-          window.location.href = role === 'staff' ? 'settings-staff.html' : 'settings-student.html';
-        }, 1500);
+          window.location.href = role === 'staff' ? 'staff-dashboard.html' : 'settings-student.html';
+        }, 700);
       } catch (error) {
-        statusText.textContent = "❌ " + error.message;
+        statusText.textContent = error.message;
       }
     });
+
+    function showSsoMessage(provider) {
+      statusText.textContent = `${provider} sign-up is not enabled yet. Please create an account with email and password.`;
+    }
+
+    function togglePassword(inputId, button) {
+      const input = document.getElementById(inputId);
+      const icon = button.querySelector('i');
+      const isHidden = input.type === 'password';
+
+      input.type = isHidden ? 'text' : 'password';
+      button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      icon.className = isHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    }
   </script>
 </body>
 </html>
