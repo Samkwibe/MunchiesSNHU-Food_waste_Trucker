@@ -9,7 +9,10 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
-connectDB();
+connectDB().catch((error) => {
+  console.error('Failed to connect to MongoDB:', error.message);
+  process.exit(1);
+});
 
 const PORT = process.env.PORT || 5001;
 

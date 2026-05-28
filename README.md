@@ -113,3 +113,42 @@ Copy `snhu-foodwaste-backend/.env.example` to `.env`. Required:
 | `PORT` | HTTP port (optional, default 5001) |
 
 Never commit `.env` or secrets to git.
+
+## Deploy to Vercel
+
+This project is configured for [Vercel](https://vercel.com) as a single Express serverless function (`api/index.js`) that serves the API and the static frontend.
+
+### 1. Push the repository to GitHub
+
+```bash
+git push origin master
+```
+
+### 2. Import the project on Vercel
+
+1. Go to [vercel.com/new](https://vercel.com/new) and import `Samkwibe/MunchiesSNHU-Food_waste_Trucker`.
+2. **Framework preset:** Other (uses root `vercel.json`).
+3. **Root directory:** `.` (repository root).
+
+### 3. Set environment variables (Project → Settings → Environment Variables)
+
+| Name | Value |
+|------|--------|
+| `MONGODB_URI` | Your MongoDB Atlas connection string |
+| `JWT_SECRET` | Same secret you use locally |
+| `NODE_ENV` | `production` (optional) |
+
+Redeploy after adding variables.
+
+### 4. Deploy from the CLI (optional)
+
+```bash
+npx vercel login
+npx vercel --prod
+```
+
+### Notes
+
+- MongoDB must be reachable from the public internet (MongoDB Atlas with `0.0.0.0/0` or Vercel IP allowlist).
+- `before-enhancement/` is excluded from deployment via `.vercelignore`.
+- Local development still uses `cd snhu-foodwaste-backend && npm start`.
