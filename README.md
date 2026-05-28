@@ -149,6 +149,7 @@ npx vercel --prod
 
 ### Notes
 
-- MongoDB must be reachable from the public internet (MongoDB Atlas with `0.0.0.0/0` or Vercel IP allowlist).
+- MongoDB must be reachable from the public internet. In **MongoDB Atlas → Network Access**, allow **`0.0.0.0/0`** (or Vercel’s IPs) so serverless functions can connect.
 - `before-enhancement/` is excluded from deployment via `.vercelignore`.
 - Local development still uses `cd snhu-foodwaste-backend && npm start`.
+- **Production URL:** [https://munchies-snhu-food-waste.vercel.app](https://munchies-snhu-food-waste.vercel.app)
