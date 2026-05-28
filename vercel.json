@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "munchies-snhu-food-waste",
   "installCommand": "cd snhu-foodwaste-backend && npm install",
   "functions": {
     "api/index.js": {
