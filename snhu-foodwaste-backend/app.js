@@ -76,6 +76,12 @@ app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/tips', require('./routes/tipRoutes'));
 // Mount food waste, reporting, and priority routes under /api/waste.
 app.use('/api/waste', require('./routes/foodWasteRoutes'));
+// Mount staff management routes under /api/staff (admin only).
+app.use('/api/staff', require('./routes/staffRoutes'));
+// Mount user administration routes under /api/users (admin only).
+app.use('/api/users', require('./routes/userRoutes'));
+// Mount notification preference routes under /api/notifications (any authenticated user).
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Serve the static frontend from the public folder so the app can be tested from one local URL.
 app.use(express.static(path.join(__dirname, '..', 'public')));

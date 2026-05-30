@@ -8,26 +8,8 @@
 // ==========================================
 const User = require('../models/User'); // User model for database operations
 const bcrypt = require('bcryptjs'); // Library for hashing and comparing passwords
-const jwt = require('jsonwebtoken'); // Library for generating JSON Web Tokens
-
-// ==========================================
-// Helper Functions
-// ==========================================
-
-/**
- * Generates a signed JSON Web Token (JWT) for a user.
- * 
- * @param {string} id - The user's unique database ID.
- * @param {string} role - The user's role (e.g., 'student', 'staff').
- * @returns {string} The signed JWT token string.
- */
-const generateToken = (id, role) => {
-  return jwt.sign(
-    { id, role }, // Payload to encode in the token
-    process.env.JWT_SECRET, // Secret key used to sign the token
-    { expiresIn: '30d' } // Token expiration time (30 days)
-  );
-};
+// Import the centralised token generator so all auth flows share one signing config.
+const generateToken = require('../utils/generateToken');
 
 const sendError = (res, statusCode, message) => res.status(statusCode).json({
   success: false,

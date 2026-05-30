@@ -4,13 +4,20 @@
 const express = require('express');
 // Create a new router object from Express
 const router = express.Router();
-// Import the FoodWasteEntry model to interact with our database collection
+// Import the FoodWasteEntry model (still needed for routes that keep inline logic).
 const FoodWasteEntry = require('../models/FoodWasteEntry');
 // Import middleware that checks the JWT and verifies staff/admin roles.
 const { protect, authorize } = require('../middleware/authMiddleware');
 // Import the helper that calculates and sorts pickup priority scores.
 const { rankWasteEntries } = require('../utils/wastePriority');
-const { sanitizeWasteBody, formatMongooseError } = require('../utils/sanitizeWasteBody');
+// Import controller functions that handle the core CRUD business logic.
+const {
+  getPublishedEntries,
+  getAllEntries,
+  createEntry,
+  updateEntry,
+  deleteEntry
+} = require('../controllers/wasteEntryController');
 
 const sendError = (res, statusCode, message) => res.status(statusCode).json({
   success: false,
@@ -19,35 +26,10 @@ const sendError = (res, statusCode, message) => res.status(statusCode).json({
 
 // 1. GET all published entries (students can see these)
 // Define a GET route at the root path '/' with an asynchronous callback function taking request (req) and response (res)
-router.get('/', async (req, res) => {
-  // Start a try block to catch any errors during the database query
-  try {
-    // Only return where published = true
-    // Await the database search for entries where the 'published' field is true
-    // Sort the results by 'createdAt' in descending order (-1) so newest is first
-    const entries = await FoodWasteEntry.find({ published: true }).sort({ createdAt: -1 });
-    // Send the found entries back to the client as a JSON response
-    res.json(entries);
-  // Catch any errors that happen in the try block
-  } catch (err) {
-    // Send a 500 (Internal Server Error) status code and the error message in JSON format
-    sendError(res, 500, err.message);
-  }
-});
+router.get('/', getPublishedEntries);
 
 // 2. GET all entries for staff/admin management
-router.get('/all', protect, authorize('staff', 'admin'), async (req, res) => {
-  // The route is protected because unpublished operational records should only be visible to staff/admin.
-  try {
-    // Fetch every entry and show the newest entries first for management screens.
-    const entries = await FoodWasteEntry.find().sort({ createdAt: -1 });
-    // Send the entries back to the frontend as JSON.
-    res.json(entries);
-  } catch (err) {
-    // If the database query fails, return a server error with the message.
-    sendError(res, 500, err.message);
-  }
-});
+router.get('/all', protect, authorize('staff', 'admin'), getAllEntries);
 
 // 3. GET ranked pickup priorities for staff/admin users
 router.get('/priority', protect, authorize('staff', 'admin'), async (req, res) => {
@@ -150,42 +132,11 @@ router.get('/reports/summary', protect, authorize('staff', 'admin'), async (req,
 });
 
 // 5. POST new waste entry (staff/admin usage)
-// Define a POST route at the root path '/' to handle creating new entries
-router.post('/', protect, authorize('staff', 'admin'), async (req, res) => {
-  // Start a try block for the database creation operation
-  try {
-    const entryFields = sanitizeWasteBody(req.body);
-    const newEntry = await FoodWasteEntry.create({
-      submittedBy: req.user._id,
-      ...entryFields,
-      published: false
-    });
-    res.status(201).json(newEntry);
-  } catch (err) {
-    sendError(res, err.statusCode || 400, formatMongooseError(err));
-  }
-});
+// Delegates to the controller so business logic stays in the MVC controller layer.
+router.post('/', protect, authorize('staff', 'admin'), createEntry);
 
 // 6. PUT to update an existing waste entry
-router.put('/:id', protect, authorize('staff', 'admin'), async (req, res) => {
-  try {
-    // Find the entry by URL id and update only the fields staff can edit from the form.
-    const entryFields = sanitizeWasteBody(req.body);
-    const entry = await FoodWasteEntry.findByIdAndUpdate(
-      req.params.id,
-      entryFields,
-      { new: true, runValidators: true }
-    );
-
-    // If MongoDB did not find an entry with that id, return a 404 response.
-    if (!entry) return sendError(res, 404, 'Entry not found');
-
-    // Return the updated entry to the frontend.
-    return res.json(entry);
-  } catch (err) {
-    return sendError(res, err.statusCode || 400, formatMongooseError(err));
-  }
-});
+router.put('/:id', protect, authorize('staff', 'admin'), updateEntry);
 
 // 7. PUT to publish/unpublish an entry
 // Define a PUT route with a dynamic parameter ':id' for the entry's unique ID
@@ -212,20 +163,7 @@ router.put('/:id/publish', protect, authorize('staff', 'admin'), async (req, res
 });
 
 // 8. DELETE an existing waste entry
-router.delete('/:id', protect, authorize('staff', 'admin'), async (req, res) => {
-  try {
-    // Find the entry by id and remove it from MongoDB.
-    const entry = await FoodWasteEntry.findByIdAndDelete(req.params.id);
-    // Return 404 when the id does not match an existing record.
-    if (!entry) return sendError(res, 404, 'Entry not found');
-
-    // Confirm deletion to the frontend.
-    return res.json({ message: 'Entry deleted' });
-  } catch (err) {
-    // Return 500 for unexpected database errors.
-    return sendError(res, 500, err.message);
-  }
-});
+router.delete('/:id', protect, authorize('staff', 'admin'), deleteEntry);
 
 // Export the router so it can be used in the main server file
 module.exports = router;

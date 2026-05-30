@@ -1,6 +1,28 @@
-// This is a placeholder file for the generateToken utility function
-// Note: Currently, the token generation logic is directly inside controllers/authController.js
-// In the future, it could be moved here for better reusability across the app
+/**
+ * generateToken.js
+ * Creates a signed JSON Web Token for authenticated users.
+ *
+ * This utility centralises token creation so every part of the app
+ * (registration, login, future token refresh) uses the same signing
+ * configuration.  Previously the logic was duplicated inside
+ * authController.js; it now lives here for reusability.
+ */
 
-// We export an empty function for now so the app doesn't crash if it tries to import this file
-module.exports = () => {};
+const jwt = require('jsonwebtoken');
+
+/**
+ * Generates a signed JWT containing the user's ID and role.
+ *
+ * @param {string} id   - The user's unique MongoDB _id.
+ * @param {string} role - The user's role (e.g. 'student', 'staff', 'admin').
+ * @returns {string} A signed JWT string valid for 30 days.
+ */
+const generateToken = (id, role) => {
+  return jwt.sign(
+    { id, role },
+    process.env.JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+};
+
+module.exports = generateToken;
