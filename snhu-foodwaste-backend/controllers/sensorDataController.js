@@ -18,6 +18,9 @@
  * @access  Private (staff, admin, or IoT device token)
  */
 const recordReading = async (req, res) => {
+  // We send back a 501 status code which means "Not Implemented Yet".
+  // This tells the frontend that the route exists, but the backend isn't ready
+  // to process automatic sensor data. We include a friendly message to explain why.
   res.status(501).json({
     success: false,
     message: 'Automated sensor recording is planned for a future release. '
@@ -31,6 +34,8 @@ const recordReading = async (req, res) => {
  * @access  Private (staff, admin)
  */
 const getHistory = async (req, res) => {
+  // Similar to recordReading, this is a placeholder. 
+  // It returns a 501 so the frontend knows this feature is coming soon.
   res.status(501).json({
     success: false,
     message: 'Sensor history retrieval is planned for a future release. '
@@ -38,6 +43,8 @@ const getHistory = async (req, res) => {
   });
 };
 
+// We export these functions so the router can use them. 
+// Even though they are placeholders, the router needs something to call.
 module.exports = {
   recordReading,
   getHistory

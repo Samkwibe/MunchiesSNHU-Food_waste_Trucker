@@ -2,24 +2,29 @@
  * notificationRoutes.js
  * Routes for user notification preference management.
  *
- * Any authenticated user can read and update their own notification
- * preferences (email, SMS, high-priority alerts).
+ * This allows a user to toggle settings like receiving emails or SMS alerts.
  */
 
-// Import the Express framework so we can create routes.
+// Import Express so we can build our API paths.
 const express = require('express');
-// Create a new router instance.
+// Create the router instance that connects URLs to controller functions.
 const router = express.Router();
-// Import the notification preference controller functions.
+
+// Import the controller functions that do the actual work of reading and saving preferences.
 const { getPreferences, updatePreferences } = require('../controllers/notificationController');
-// Import middleware for JWT authentication.
+
+// Import the 'protect' middleware.
+// We use this because a user must be logged in to see or change their preferences.
+// We do NOT use 'authorize' here, because ALL users (students, staff, admin) have preferences.
 const { protect } = require('../middleware/authMiddleware');
 
-// GET /api/notifications/preferences — Get the current user's notification preferences.
+// GET /api/notifications/preferences
+// Returns the currently logged-in user's notification settings.
 router.get('/preferences', protect, getPreferences);
 
-// PUT /api/notifications/preferences — Update the current user's notification preferences.
+// PUT /api/notifications/preferences
+// Saves new changes to the currently logged-in user's notification settings.
 router.put('/preferences', protect, updatePreferences);
 
-// Export the router so it can be mounted in app.js.
+// Export the router so it can be mounted into the main application.
 module.exports = router;
