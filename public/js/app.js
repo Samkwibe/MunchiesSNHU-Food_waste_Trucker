@@ -22,7 +22,18 @@ async function renderCharts() {
   try {
     // Await the latest data from the backend
     const data = await fetchData();
+    // If there is no data, show an empty state message in the UI instead of crashing or showing fake numbers
     if (!Array.isArray(data) || data.length === 0) {
+      ['weightChart', 'humidityChart'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.parentElement) {
+          el.parentElement.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;">No sensor or waste data available yet. Please add entries to see charts.</div>';
+        }
+      });
+      ['fullnessValue', 'phValue'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = '--';
+      });
       return;
     }
   
@@ -40,8 +51,10 @@ async function renderCharts() {
     const humidities = data.map(d => d.humidity);
     
     // Get the most recent fullness and pH readings from the latest data point (last element)
-    const fullness = data[data.length - 1].binFullness;
-    const ph = data[data.length - 1].pH;
+    // DEFENSIVE CHECK: Fallback to 0 or a safe default if the sensor data fields are missing
+    const latestEntry = data[data.length - 1] || {};
+    const fullness = latestEntry.binFullness || 0;
+    const ph = latestEntry.pH || '--';
   
     // ==========================================
     // Chart Initialization

@@ -8,6 +8,8 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "start": "npm start --prefix snhu-foodwaste-backend",
+    "dev": "npm run dev --prefix snhu-foodwaste-backend",
     "vercel-build": "echo \"Vercel build complete\"",
     "deploy:gh-pages": "gh-pages -d public"
   },
